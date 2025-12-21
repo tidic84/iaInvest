@@ -54,7 +54,7 @@ DB_POOL_TIMEOUT=30
 # ============================================
 
 # Grok (xAI) - https://x.ai/api
-GROK_API_KEY=xai-VOTRE-CLE-GROK-ICI
+XAI_API_KEY=xai-VOTRE-CLE-GROK-ICI
 GROK_BASE_URL=https://api.x.ai/v1
 GROK_MODEL=grok-beta
 
@@ -314,14 +314,14 @@ DATABASE_URL=sqlite:////home/trading/trading-ai/backend/trading_ai.db
 
 **Configuration:**
 ```bash
-GROK_API_KEY=xai-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+XAI_API_KEY=xai-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 **Test:**
 ```bash
 curl https://api.x.ai/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $GROK_API_KEY" \
+  -H "Authorization: Bearer $XAI_API_KEY" \
   -d '{
     "model": "grok-beta",
     "messages": [{"role": "user", "content": "Hello"}]
@@ -550,7 +550,7 @@ load_dotenv()
 
 REQUIRED_VARS = [
     'DATABASE_URL',
-    'GROK_API_KEY',
+    'XAI_API_KEY',
     'SECRET_KEY',
     'TRADING_MODE',
 ]
@@ -668,7 +668,7 @@ echo $CORS_ORIGINS
 **3. API keys invalid**
 ```bash
 # Tester Grok
-curl https://api.x.ai/v1/models -H "Authorization: Bearer $GROK_API_KEY"
+curl https://api.x.ai/v1/models -H "Authorization: Bearer $XAI_API_KEY"
 
 # Tester Twitter
 curl "https://api.twitter.com/2/tweets/search/recent?query=test" \

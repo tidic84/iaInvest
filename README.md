@@ -38,7 +38,7 @@ Système de trading autonome intelligent qui apprend de ses erreurs et améliore
 
 ### Backend
 - **Framework**: FastAPI (Python 3.11+)
-- **IA**: Grok API (xAI) avec function calling
+- **IA**: Grok API (xAI SDK) avec web_search, x_search
 - **Database**: PostgreSQL ou SQLite
 - **Market Data**: yfinance (actions), ccxt (crypto)
 - **WebSocket**: python-socketio
@@ -78,6 +78,7 @@ cp .env.example .env
 # Éditer .env avec vos clés
 
 # Initialiser database
+alembic revision --autogenerate -m "Initial schema"
 alembic upgrade head
 
 # Lancer backend
@@ -106,14 +107,14 @@ Voir **[DEPLOYMENT.md](DEPLOYMENT.md)** pour instructions détaillées de déplo
 
 | Service | Utilisation | Coût | Obtention |
 |---------|-------------|------|-----------|
-| **Grok (xAI)** | IA trading & auto-réflexion | $4-6/semaine | https://x.ai/api |
+| **xAI (Grok)** | IA trading & auto-réflexion | $4-6/semaine | https://x.ai/api |
 | **Twitter/X** | Sentiment analysis | Gratuit (limites) | https://developer.twitter.com |
 | **Google Search** | Recherches internet | Gratuit (100/jour) | https://developers.google.com/custom-search |
 
 ## 💰 Coûts Estimés
 
 **Mode Paper Trading:**
-- Grok API: $4-6/semaine (~$20-25/mois)
+- xAI API (Grok): $4-6/semaine (~$20-25/mois)
 - Autres APIs: Gratuit
 - VPS: $10-20/mois (2 vCPU, 4GB RAM)
 - **TOTAL: ~$30-45/mois**

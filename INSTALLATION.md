@@ -169,7 +169,7 @@ pip list
 - yfinance (market data stocks)
 - ccxt (market data crypto)
 - tweepy (Twitter API)
-- openai (Grok API compatible)
+- xai-sdk (SDK officiel xAI)
 - pandas, numpy (data processing)
 
 ### 4. Configuration Variables d'Environnement
@@ -193,7 +193,7 @@ SECRET_KEY=changez-cette-cle-en-production
 DATABASE_URL=sqlite:///./trading_ai.db
 
 # API Keys (OBLIGATOIRE)
-GROK_API_KEY=xai-votre-cle-ici
+XAI_API_KEY=xai-votre-cle-ici
 
 # Trading
 TRADING_MODE=paper
@@ -392,7 +392,7 @@ SELECT COUNT(*) FROM trades;
 
 **Ajouter à .env:**
 ```bash
-GROK_API_KEY=xai-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+XAI_API_KEY=xai-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 GROK_BASE_URL=https://api.x.ai/v1
 GROK_MODEL=grok-beta
 ```
@@ -400,7 +400,7 @@ GROK_MODEL=grok-beta
 **Test:**
 ```bash
 curl https://api.x.ai/v1/models \
-  -H "Authorization: Bearer $GROK_API_KEY"
+  -H "Authorization: Bearer $XAI_API_KEY"
 ```
 
 ### 2. Twitter/X API - OPTIONNEL
@@ -655,11 +655,11 @@ uvicorn main:app --port 8001
 **Solution:**
 ```bash
 # Vérifier clé API dans .env
-echo $GROK_API_KEY
+echo $XAI_API_KEY
 
 # Tester manuellement
 curl https://api.x.ai/v1/models \
-  -H "Authorization: Bearer $GROK_API_KEY"
+  -H "Authorization: Bearer $XAI_API_KEY"
 
 # Si erreur, régénérer clé sur https://x.ai/api
 ```

@@ -101,3 +101,19 @@ Desktop.ini
 tmp/
 temp/
 *.tmp
+
+# Temporary documentation files
+*_RESOLU.txt
+*_APPLIQUEES.md
+*_CORRECTION*.md
+*_SUMMARY.txt
+*_RAPIDE.txt
+*_SETUP_GUIDE.md
+*_STEPS.md
+*_RESULTS.md
+*_REPORT.md
+*_FINAL.md
+*_CONFIG.txt
+QUICKSTART.md
+LANCEMENT.md
+test_project.py

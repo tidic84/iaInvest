@@ -127,7 +127,7 @@ SECRET_KEY=your-super-secret-key-change-this-in-production
 DATABASE_URL=postgresql://trading_user:strong_password@localhost:5432/trading_ai_db
 
 # API Keys
-GROK_API_KEY=xai-your-grok-api-key-here
+XAI_API_KEY=xai-your-grok-api-key-here
 TWITTER_API_KEY=your-twitter-api-key
 TWITTER_API_SECRET=your-twitter-secret
 TWITTER_BEARER_TOKEN=your-bearer-token
