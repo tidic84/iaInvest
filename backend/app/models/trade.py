@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Enum, ForeignKey
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -52,6 +52,13 @@ class Trade(Base):
 
     # Trade metadata
     trade_metadata = Column(JSON, nullable=True)
+
+    # Strategy and watchlist references (for autonomous trader)
+    strategy_id = Column(Integer, ForeignKey("trading_strategies.id"), nullable=True, index=True)
+    watchlist_id = Column(Integer, ForeignKey("watchlist.id"), nullable=True, index=True)
+
+    # Exit reason (for tracking why trades are closed)
+    exit_reason = Column(String, nullable=True)
 
     def __repr__(self):
         return f"<Trade {self.trade_number}: {self.action} {self.symbol} @ {self.entry_price}>"

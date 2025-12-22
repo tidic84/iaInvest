@@ -13,24 +13,33 @@ export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Statistics | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [history, setHistory] = useState<PortfolioSnapshot[]>([]);
-  const { activities, isConnected } = useWebSocket();
+  const { activities: wsActivities, isConnected } = useWebSocket();
+  const [apiActivities, setApiActivities] = useState<any[]>([]);
+
+  // Use WebSocket activities if available, otherwise use API activities
+  const activities = wsActivities.length > 0 ? wsActivities : apiActivities;
 
   const fetchData = async () => {
     try {
-      const [statusRes, portfolioRes, statsRes, tradesRes, historyRes] =
+      const [statusRes, portfolioRes, statsRes, tradesRes, historyRes, activitiesRes] =
         await Promise.all([
           tradingAPI.getTradingStatus(),
           tradingAPI.getCurrentPortfolio(),
           tradingAPI.getStatistics(),
           tradingAPI.getTrades(20),
           tradingAPI.getPortfolioHistory(50),
+          tradingAPI.getActivities(50),
         ]);
+
+      console.log('[Dashboard] Trading status:', statusRes.data);
+      console.log('[Dashboard] Activities count:', activitiesRes.data.activities.length);
 
       setIsRunning(statusRes.data.is_running);
       setPortfolio(portfolioRes.data);
       setStats(statsRes.data);
       setTrades(tradesRes.data);
       setHistory(historyRes.data);
+      setApiActivities(activitiesRes.data.activities);
     } catch (error) {
       console.error('Error fetching data:', error);
     }

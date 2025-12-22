@@ -29,8 +29,11 @@ class ConnectionManager:
         logger.info(f"WebSocket client connected. Total: {len(self.active_connections)}")
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-        logger.info(f"WebSocket client disconnected. Total: {len(self.active_connections)}")
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+            logger.info(f"WebSocket client disconnected. Total: {len(self.active_connections)}")
+        else:
+            logger.debug("WebSocket already removed from connections")
 
     async def broadcast(self, message: dict):
         """Broadcast message to all connected clients."""
@@ -39,12 +42,14 @@ class ConnectionManager:
             try:
                 await connection.send_json(message)
             except Exception as e:
-                logger.error(f"Error sending to client: {e}")
+                logger.warning(f"Client disconnected during broadcast: {type(e).__name__}")
                 disconnected.append(connection)
 
         # Remove disconnected clients
-        for conn in disconnected:
-            self.active_connections.remove(conn)
+        if disconnected:
+            for conn in disconnected:
+                self.active_connections.remove(conn)
+            logger.info(f"Cleaned up {len(disconnected)} dead connections. Active: {len(self.active_connections)}")
 
 
 manager = ConnectionManager()
@@ -69,9 +74,10 @@ app = FastAPI(
 )
 
 # Configure CORS
+# In development, allow all origins. In production, use settings.cors_origins_list
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=["*"] if settings.DEBUG else settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -97,21 +103,30 @@ async def websocket_endpoint(websocket: WebSocket):
                 }
             })
 
+        # Track last sent activity index
+        last_sent_index = len(trading_agent.activity_log) if trading_agent else 0
+
         # Keep connection alive and send updates
         while True:
-            # Send activity updates every 2 seconds
-            if trading_agent and trading_agent.activity_log:
-                await websocket.send_json({
-                    "type": "activity",
-                    "data": trading_agent.activity_log[-1]  # Latest activity
-                })
+            # Send only new activities
+            if trading_agent:
+                current_count = len(trading_agent.activity_log)
+                if current_count > last_sent_index:
+                    # Send all new activities
+                    new_activities = trading_agent.activity_log[last_sent_index:]
+                    for activity in new_activities:
+                        await websocket.send_json({
+                            "type": "activity",
+                            "data": activity
+                        })
+                    last_sent_index = current_count
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)  # Check every second
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception as e:
-        logger.error(f"WebSocket error: {e}")
+        logger.warning(f"WebSocket error: {type(e).__name__}")
         manager.disconnect(websocket)
 
 
@@ -162,14 +177,34 @@ async def get_trading_status():
     if not trading_agent:
         return {
             "is_running": False,
-            "last_trade_time": None,
-            "activity_count": 0
+            "activity_count": 0,
+            "has_strategy": False,
+            "last_discovery": None,
+            "last_analysis": None,
+            "last_monitoring": None
         }
 
     return {
         "is_running": trading_agent.is_running,
-        "last_trade_time": trading_agent.last_trade_time.isoformat() if trading_agent.last_trade_time else None,
-        "activity_count": len(trading_agent.activity_log)
+        "activity_count": len(trading_agent.activity_log),
+        "has_strategy": trading_agent.current_strategy is not None,
+        "strategy_style": trading_agent.current_strategy.style if trading_agent.current_strategy else None,
+        "last_discovery": trading_agent.last_discovery.isoformat() if trading_agent.last_discovery else None,
+        "last_analysis": trading_agent.last_analysis.isoformat() if trading_agent.last_analysis else None,
+        "last_monitoring": trading_agent.last_monitoring.isoformat() if trading_agent.last_monitoring else None
+    }
+
+
+@app.get("/api/trading/activities")
+async def get_activities(limit: int = 50):
+    """Get recent activity logs."""
+    global trading_agent
+
+    if not trading_agent:
+        return {"activities": []}
+
+    return {
+        "activities": trading_agent.activity_log[-limit:]
     }
 
 

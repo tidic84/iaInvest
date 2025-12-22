@@ -20,11 +20,44 @@ class MarketDataService:
                 ticker = self.exchange.fetch_ticker(symbol)
                 return ticker['last']
             else:
-                # Stock
+                # Stock - try multiple methods
                 stock = yf.Ticker(symbol)
-                data = stock.history(period='1d', interval='1m')
-                if not data.empty:
-                    return data['Close'].iloc[-1]
+
+                # Method 1: Try fast_info (most reliable)
+                try:
+                    if hasattr(stock, 'fast_info') and hasattr(stock.fast_info, 'last_price'):
+                        price = stock.fast_info.last_price
+                        if price and price > 0:
+                            logger.info(f"Got price for {symbol}: ${price:.2f} (fast_info)")
+                            return float(price)
+                except Exception as e:
+                    logger.debug(f"fast_info failed for {symbol}: {e}")
+
+                # Method 2: Try info
+                try:
+                    info = stock.info
+                    if 'currentPrice' in info and info['currentPrice']:
+                        price = info['currentPrice']
+                        logger.info(f"Got price for {symbol}: ${price:.2f} (info)")
+                        return float(price)
+                    elif 'regularMarketPrice' in info and info['regularMarketPrice']:
+                        price = info['regularMarketPrice']
+                        logger.info(f"Got price for {symbol}: ${price:.2f} (regularMarketPrice)")
+                        return float(price)
+                except Exception as e:
+                    logger.debug(f"info failed for {symbol}: {e}")
+
+                # Method 3: Try history with 1d interval
+                try:
+                    data = stock.history(period='1d')
+                    if not data.empty:
+                        price = data['Close'].iloc[-1]
+                        logger.info(f"Got price for {symbol}: ${price:.2f} (history)")
+                        return float(price)
+                except Exception as e:
+                    logger.debug(f"history failed for {symbol}: {e}")
+
+                logger.warning(f"All methods failed for {symbol}")
             return None
         except Exception as e:
             logger.error(f"Error fetching price for {symbol}: {e}")

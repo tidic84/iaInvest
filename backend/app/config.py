@@ -46,6 +46,21 @@ class Settings(BaseSettings):
     REFLECTION_INTERVAL: int = 5
     REFLECTION_ENABLED: bool = True
 
+    # Autonomous Trading Cycles
+    DISCOVERY_INTERVAL: int = 3600  # 1 hour
+    ANALYSIS_INTERVAL: int = 1800  # 30 minutes
+    MONITORING_INTERVAL: int = 900  # 15 minutes
+    REFLECTION_TRADES_THRESHOLD: int = 10
+
+    # Strategy
+    AUTO_STRATEGY_CREATION: bool = True
+    STRATEGY_RISK_PROFILE: str = "moderate"  # conservative, moderate, aggressive
+
+    # Watchlist
+    MAX_WATCHLIST_SIZE: int = 20
+    MIN_OPPORTUNITY_SCORE: float = 6.0
+    AUTO_REMOVE_LOW_PRIORITY_DAYS: int = 7
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000

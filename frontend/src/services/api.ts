@@ -46,4 +46,5 @@ export const tradingAPI = {
 
   // Activity
   getActivity: (limit: number = 100) => api.get<ActivityLog[]>('/api/activity', { params: { limit } }),
+  getActivities: (limit: number = 50) => api.get<{ activities: ActivityLog[] }>('/api/trading/activities', { params: { limit } }),
 };
